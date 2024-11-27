@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+option csharp_namespace = "ProductService_gRPC.Protos";
+
+package ProductService.v1;
+
+// The product service definition
+service ProductService_proto {
+  rpc GetProducts (Empty) returns (ProductList);
+  rpc GetProduct (ProductRequest) returns (Product);
+  rpc CreateProduct (Product) returns (Product);
+  rpc UpdateProduct (Product) returns (Product);
+  rpc DeleteProduct (ProductRequest) returns (Empty);
+}
+
+// Product message
+message Product {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  double price = 4;
+  int32 stock = 5;
+}
+
+// Product request for GetProduct and DeleteProduct
+message ProductRequest {
+  int32 id = 1;
+}
+
+// Product list response
+message ProductList {
+  repeated Product products = 1;
+}
+
+// Empty message
+message Empty {}
