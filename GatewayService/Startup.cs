@@ -1,3 +1,4 @@
+using Ecommerce;
 using GatewayService.Filters;
 using GatewayService.MIddlewares;
 using Grpc.Net.Client;
@@ -30,11 +31,11 @@ namespace GatewayService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //// Step 1: Register gRPC client in DI container
-            //services.AddGrpcClient<ProductService_proto.ProductService_protoClient>(o =>
-            //{
-            //    o.Address = new Uri("https://localhost:5000");  // Replace with the actual URL for ProductService
-            //});
+            // Step 1: Register gRPC client in DI container
+            services.AddGrpcClient<ProductService_proto.ProductService_protoClient>(o =>
+            {
+                o.Address = new Uri("http://localhost:5000");  // Replace with the actual URL for ProductService
+            });
 
 
             services.AddControllers();

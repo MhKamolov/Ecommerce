@@ -5,8 +5,10 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<Protobuf Include="Protos\products.proto" GrpcServices="Server" />
+		<Protobuf Include="Protos\products.proto" GrpcServices="Server" AdditionalImportDirs="Protos\googleapis" />
+		<Protobuf Include="Protos\googleapis\google\type\money.proto" />
 	</ItemGroup>
+
 
 	<ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.11.0" />

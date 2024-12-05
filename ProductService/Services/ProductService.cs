@@ -1,9 +1,10 @@
+using Ecommerce;
 using FluentValidation.Results;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.Extensions.Logging;
 using ProductService_gRPC;
-using ProductService_gRPC.Protos;
 using ProductService_gRPC.Repositories;
 using ProductService_gRPC.Validators;
 using System;
@@ -29,10 +30,10 @@ namespace ProductService_gRPC.Services
                 Id = p.Id,
                 Name = p.Name,
                 Description = p.Description,
-                Price = (double)p.Price,
+                Price = p.Price,
                 Stock = p.Stock
             }).ToList();
-
+            
             return Task.FromResult(new ProductList { Products = { products } });
         }
 
@@ -45,7 +46,7 @@ namespace ProductService_gRPC.Services
                 Id = product.Id,
                 Name = product.Name,
                 Description = product.Description,
-                Price = (double)product.Price,
+                Price = product.Price,
                 Stock = product.Stock
             } : null);
         }
@@ -57,12 +58,14 @@ namespace ProductService_gRPC.Services
                 Id = request.Id,
                 Name = request.Name,
                 Description = request.Description,
-                Price = (decimal)request.Price,
+                Price = request.Price,
                 Stock = request.Stock
             };
+
+
             ProductValidator validator = new ProductValidator();
             ValidationResult result = validator.Validate(product);
-            if (result.Errors.Count > 0) { throw new Exception(String.Join("\n", result.Errors)); }
+            //if (result.Errors.Count > 0) { throw new Exception(String.Join("\n", result.Errors)); }
 
             _productRepository.NewProduct(product);
             return Task.FromResult(new Product()
@@ -70,7 +73,7 @@ namespace ProductService_gRPC.Services
                 Id = product.Id,
                 Name = product.Name,
                 Description = product.Description,
-                Price = (double)product.Price,
+                Price = product.Price,
                 Stock = product.Stock
             });
         }
@@ -82,12 +85,13 @@ namespace ProductService_gRPC.Services
                 Id = request.Id,
                 Name = request.Name,
                 Description = request.Description,
-                Price = (decimal)request.Price,
+                Price = request.Price,
                 Stock = request.Stock
             };
+
             ProductValidator validator = new ProductValidator();
             ValidationResult result = validator.Validate(product);
-            if (result.Errors.Count > 0) { throw new Exception(String.Join("\n", result.Errors)); }
+            //if (result.Errors.Count > 0) { throw new Exception(String.Join("\n", result.Errors)); }
 
             _productRepository.UpdateProduct(product);
             return Task.FromResult(new Product()
@@ -95,7 +99,7 @@ namespace ProductService_gRPC.Services
                 Id = product.Id,
                 Name = product.Name,
                 Description = product.Description,
-                Price = (double)product.Price,
+                Price = product.Price,
                 Stock = product.Stock
             });
         }

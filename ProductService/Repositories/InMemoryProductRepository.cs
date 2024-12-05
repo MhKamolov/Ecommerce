@@ -7,15 +7,17 @@ namespace ProductService_gRPC.Repositories
     public class InMemoryProductRepository : IProductRepository
     {
         private readonly List<Product> _products = new List<Product>();
-
+        private int IdCounter;
         public IEnumerable<Product> GetAllProducts() => _products;
 
         public Product GetProductById(int id) => _products.FirstOrDefault(p => p.Id == id);
 
         public void NewProduct(Product product)
         {
-            product.Id = _products.Any() ? _products.Max(p => p.Id) + 1 : 1;
+            //product.Id = _products.Any() ? _products.Max(p => p.Id) + 1 : 1;
+            product.Id = IdCounter;
             _products.Add(product);
+            IdCounter++;
         }
 
         public void UpdateProduct(Product product)
