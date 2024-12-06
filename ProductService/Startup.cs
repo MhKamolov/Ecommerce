@@ -24,7 +24,7 @@ namespace ProductService_gRPC
             services.AddGrpc();
 
             services.AddSingleton<IProductRepository, InMemoryProductRepository>(); 
-            services.AddSingleton<ProductService>();
+            services.AddSingleton<ProductService_gRPC.Services.ProductService>();
             services.AddTransient<IValidator<Product>, ProductValidator>();
 
         }

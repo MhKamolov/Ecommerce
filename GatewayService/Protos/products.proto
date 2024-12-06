@@ -13,9 +13,9 @@ import "google/type/money.proto";
 // The product service definition
 service ProductService_proto {
   rpc GetProducts (google.protobuf.Empty) returns (ProductList);
-  rpc GetProduct (ProductRequest) returns (Product);
-  rpc CreateProduct (Product) returns (Product);
-  rpc UpdateProduct (Product) returns (Product);
+  rpc GetProduct (ProductRequest) returns (ProductResponse);
+  rpc CreateProduct (Product) returns (ProductResponse);
+  rpc UpdateProduct (Product) returns (ProductResponse);
   rpc DeleteProduct (ProductRequest) returns (google.protobuf.Empty);
 }
 
@@ -31,6 +31,13 @@ message Product {
 // Product request for GetProduct and DeleteProduct
 message ProductRequest {
   int32 id = 1;
+}
+
+message ProductResponse {
+    oneof result {
+        Product product = 1;
+        string error = 2;
+    }
 }
 
 // Product list response

@@ -14,7 +14,6 @@ namespace ProductService_gRPC.Repositories
 
         public void NewProduct(Product product)
         {
-            //product.Id = _products.Any() ? _products.Max(p => p.Id) + 1 : 1;
             product.Id = IdCounter;
             _products.Add(product);
             IdCounter++;

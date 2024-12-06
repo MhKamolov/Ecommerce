@@ -1,6 +1,7 @@
 using Ecommerce;
 using FluentValidation.Results;
 using Google.Protobuf.WellKnownTypes;
+using Google.Type;
 using Grpc.Core;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.Extensions.Logging;
@@ -37,21 +38,34 @@ namespace ProductService_gRPC.Services
             return Task.FromResult(new ProductList { Products = { products } });
         }
 
-        public override Task<Product> GetProduct(ProductRequest request, ServerCallContext context)
+        public override Task<ProductResponse> GetProduct(ProductRequest request, ServerCallContext context)
         {
             var product = _productRepository.GetProductById(request.Id);
 
-            return Task.FromResult(product != null ? new Product
+            if (product != null)
             {
-                Id = product.Id,
-                Name = product.Name,
-                Description = product.Description,
-                Price = product.Price,
-                Stock = product.Stock
-            } : null);
+                return Task.FromResult(new ProductResponse
+                {
+                    Product = new Product
+                    {
+                        Id = product.Id,
+                        Name = product.Name,
+                        Description = product.Description,
+                        Price = product.Price,
+                        Stock = product.Stock
+                    }
+                });
+            }
+            else
+            {
+                return Task.FromResult(new ProductResponse
+                {
+                    Error = $"Product with ID {request.Id} not found."
+                });
+            }
         }
 
-        public override Task<Product> CreateProduct(Product request, ServerCallContext context)
+        public override Task<ProductResponse> CreateProduct(Product request, ServerCallContext context)
         {
             var product = new Models.Product
             {
@@ -62,23 +76,32 @@ namespace ProductService_gRPC.Services
                 Stock = request.Stock
             };
 
-
             ProductValidator validator = new ProductValidator();
             ValidationResult result = validator.Validate(product);
-            //if (result.Errors.Count > 0) { throw new Exception(String.Join("\n", result.Errors)); }
+            if (result.Errors.Count > 0) 
+            {
+                return Task.FromResult(new ProductResponse
+                {
+                     Error = String.Join(" || ", result.Errors)
+                });
+            }
 
             _productRepository.NewProduct(product);
-            return Task.FromResult(new Product()
+            return Task.FromResult(new ProductResponse
             {
-                Id = product.Id,
-                Name = product.Name,
-                Description = product.Description,
-                Price = product.Price,
-                Stock = product.Stock
+                Product = new Product
+                {
+                    Id = product.Id,
+                    Name = product.Name,
+                    Description = product.Description,
+                    Price = product.Price,
+                    Stock = product.Stock
+                }
             });
+
         }
 
-        public override Task<Product> UpdateProduct(Product request, ServerCallContext context)
+        public override Task<ProductResponse> UpdateProduct(Product request, ServerCallContext context)
         {
             var product = new Models.Product
             {
@@ -86,21 +109,31 @@ namespace ProductService_gRPC.Services
                 Name = request.Name,
                 Description = request.Description,
                 Price = request.Price,
-                Stock = request.Stock
+                Stock = request.Stock 
             };
 
             ProductValidator validator = new ProductValidator();
             ValidationResult result = validator.Validate(product);
-            //if (result.Errors.Count > 0) { throw new Exception(String.Join("\n", result.Errors)); }
+            if (result.Errors.Count > 0)
+            {
+                return Task.FromResult(new ProductResponse
+                {
+                    Error = String.Join(" || ", result.Errors)
+                });
+            }
 
             _productRepository.UpdateProduct(product);
-            return Task.FromResult(new Product()
+
+            return Task.FromResult(new ProductResponse
             {
-                Id = product.Id,
-                Name = product.Name,
-                Description = product.Description,
-                Price = product.Price,
-                Stock = product.Stock
+                Product = new Product
+                {
+                    Id = product.Id,
+                    Name = product.Name,
+                    Description = product.Description,
+                    Price = product.Price,
+                    Stock = product.Stock
+                }
             });
         }
 
