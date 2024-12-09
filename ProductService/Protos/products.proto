@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+option csharp_namespace = "Ecommerce";
+
+package products;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+
+import "google/type/money.proto";
+
+
+// The product service definition
+service ProductService_proto {
+  rpc GetProducts (google.protobuf.Empty) returns (ProductList);
+  rpc GetProduct (ProductRequest) returns (ProductResponse);
+  rpc CreateProduct (Product) returns (ProductResponse);
+  rpc UpdateProduct (Product) returns (ProductResponse);
+  rpc DeleteProduct (ProductRequest) returns (google.protobuf.Empty);
+}
+
+// Product message
+message Product {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  google.type.Money price = 4;
+  int32 stock = 5;
+}
+
+// Product request for GetProduct and DeleteProduct
+message ProductRequest {
+  int32 id = 1;
+}
+
+message ProductResponse {
+    oneof result {
+        Product product = 1;
+        string error = 2;
+    }
+}
+
+// Product list response
+message ProductList {
+  repeated Product products = 1;
+}
+
