@@ -1,6 +1,6 @@
 ﻿using Ecommerce;
 
-namespace ProductService_gRPC.Models
+namespace ProductService.Models 
 {
     public class Product
     {

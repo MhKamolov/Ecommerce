@@ -1,14 +1,16 @@
-﻿using ProductService_gRPC.Models;
+﻿using ProductService.Models;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace ProductService_gRPC.Repositories
+namespace ProductService.Repositories 
 {
     public interface IProductRepository
     {
-        IEnumerable<Product> GetAllProducts();
-        Product GetProductById(int id);
-        void NewProduct(Product product);
-        void UpdateProduct(Product product);
-        void DeleteProduct(int id);
+        Task<IEnumerable<Product>> GetAllProducts(CancellationToken cancellationToke);
+        Task<Product> GetProductById(int id, CancellationToken cancellationToke);
+        Task<bool> NewProduct(Product product, CancellationToken cancellationToke);
+        Task<bool> UpdateProduct(Product product, CancellationToken cancellationToke);
+        Task<bool> DeleteProduct(int id, CancellationToken cancellationToke);
     }
 }

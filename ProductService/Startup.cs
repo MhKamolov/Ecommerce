@@ -4,16 +4,16 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using ProductService_gRPC.Repositories;
-using ProductService_gRPC.Validators;
-using ProductService_gRPC.Models;
+using ProductService.Repositories;
+using ProductService.Validators;
+using ProductService.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ProductService_gRPC.Services;
+using ProductService.Services;
 
-namespace ProductService_gRPC
+namespace ProductService
 {
     public class Startup
     {
@@ -24,7 +24,7 @@ namespace ProductService_gRPC
             services.AddGrpc();
 
             services.AddSingleton<IProductRepository, InMemoryProductRepository>(); 
-            services.AddSingleton<ProductService_gRPC.Services.ProductService>();
+            services.AddSingleton<ProductService.Services.ProductService>();
             services.AddTransient<IValidator<Product>, ProductValidator>();
 
         }

@@ -3,7 +3,7 @@ using System;
 using Google.Type;
 using ProductService.Validators;
 
-namespace ProductService_gRPC.Validators
+namespace ProductService.Validators 
 {
     public class ProductValidator : AbstractValidator<Models.Product>
     {
