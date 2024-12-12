@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ProductService_gRPC
+namespace ProductService 
 {
     public class Program
     {

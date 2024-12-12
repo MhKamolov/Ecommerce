@@ -1,43 +1,86 @@
-﻿using ProductService_gRPC.Models;
+﻿using ProductService.Models;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Threading;
 
-namespace ProductService_gRPC.Repositories
+namespace ProductService.Repositories
 {
     public class InMemoryProductRepository : IProductRepository
     {
-        private readonly List<Product> _products = new List<Product>();
-        private int IdCounter;
-        public IEnumerable<Product> GetAllProducts() => _products;
+        private readonly ConcurrentDictionary<int, Product> _products = new();
+        private readonly SemaphoreSlim _semaphore = new(1, 1);
+        private int _currentId = 0;
 
-        public Product GetProductById(int id) => _products.FirstOrDefault(p => p.Id == id);
-
-        public void NewProduct(Product product)
+        public Task<IEnumerable<Product>> GetAllProducts(CancellationToken cancellationToken)
         {
-            product.Id = IdCounter;
-            _products.Add(product);
-            IdCounter++;
+            return Task.FromResult(_products.Values.AsEnumerable());
         }
 
-        public void UpdateProduct(Product product)
+        public Task<Product> GetProductById(int id, CancellationToken cancellationToken)
         {
-            var existingProduct = _products.FirstOrDefault(p => p.Id == product.Id);
-            if (existingProduct != null)
+            _products.TryGetValue(id, out var product);
+            return Task.FromResult(product);
+        }
+
+        public async Task<bool> NewProduct(Product product, CancellationToken cancellationToken)
+        {
+            await _semaphore.WaitAsync(cancellationToken);
+            try
             {
-                existingProduct.Name = product.Name;
-                existingProduct.Description = product.Description;
-                existingProduct.Price = product.Price;
-                existingProduct.Stock = product.Stock;
+                if (_products.Values.Any(x => x.Name == product.Name)) { return false; }
+
+                int newId = ++_currentId;
+                product.Id = newId;
+                if (!_products.ContainsKey(newId))
+                {
+                    product.Id = _currentId;
+                    _products[_currentId] = product;
+                    return true;
+                }
+                return false;
+            }
+            finally
+            {
+                _semaphore.Release();
             }
         }
 
-        public void DeleteProduct(int id)
+        public async Task<bool> UpdateProduct(Product product, CancellationToken cancellationToken)
         {
-            var product = _products.FirstOrDefault(p => p.Id == id);
-            if (product != null)
+            await _semaphore.WaitAsync(cancellationToken);
+            try
             {
-                _products.Remove(product);
+                if (_products.Values.Any(x => x.Name == product.Name)) { return false; }
+
+                if (_products.ContainsKey(product.Id))
+                {
+                    _products[product.Id] = product;
+                    return true;
+                }
+                return false;
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+
+        }
+
+        public async Task<bool> DeleteProduct(int id, CancellationToken cancellationToken)
+        {
+            await _semaphore.WaitAsync(cancellationToken);
+            try
+            {
+                return _products.TryRemove(id, out _);
+            }
+            finally
+            {
+                _semaphore.Release();
             }
         }
+
+
     }
 }

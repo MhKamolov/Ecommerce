@@ -1,6 +1,6 @@
 ﻿{
   "profiles": {
-    "ProductService_gRPC": {
+    "ProductService": {
       "commandName": "Project",
       "dotnetRunMessages": "true",
       "launchBrowser": false,
