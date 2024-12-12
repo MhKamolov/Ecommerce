@@ -26,7 +26,7 @@ namespace ProductService.Services
 
         public override async Task<ProductList> GetProducts(Empty request, ServerCallContext context)
         {
-            var products = await _productRepository.GetAllProducts(context.CancellationToken).ConfigureAwait(false);
+            var products = await _productRepository.GetAllProducts(context.CancellationToken);
             var response = new ProductList();
             response.Products.AddRange(products.Select(p => new Product
             {
@@ -41,7 +41,7 @@ namespace ProductService.Services
 
         public override async Task<ProductResponse> GetProduct(ProductRequest request, ServerCallContext context)
         {
-            var product = await _productRepository.GetProductById(request.Id, context.CancellationToken).ConfigureAwait(false);
+            var product = await _productRepository.GetProductById(request.Id, context.CancellationToken);
             if (product == null)
             {
                 return new ProductResponse
@@ -83,8 +83,7 @@ namespace ProductService.Services
                 };
             }
 
-            var success = await _productRepository.NewProduct(product, context.CancellationToken).ConfigureAwait(false);
-
+            var success = await _productRepository.NewProduct(product, context.CancellationToken);
             if (!success)
             {
                 return new ProductResponse
@@ -127,7 +126,7 @@ namespace ProductService.Services
                 };
             }
 
-            var success = await _productRepository.UpdateProduct(product, context.CancellationToken).ConfigureAwait(false);
+            var success = await _productRepository.UpdateProduct(product, context.CancellationToken);
 
             if (!success)
             {
@@ -152,7 +151,7 @@ namespace ProductService.Services
         
         public override async Task<Empty> DeleteProduct(ProductRequest request, ServerCallContext context)
         {
-            var success = await _productRepository.DeleteProduct(request.Id, context.CancellationToken).ConfigureAwait(false);
+            var success = await _productRepository.DeleteProduct(request.Id, context.CancellationToken);
 
             if (!success)
             {

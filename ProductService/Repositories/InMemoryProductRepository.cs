@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 
-namespace ProductService.Repositories  
+namespace ProductService.Repositories
 {
     public class InMemoryProductRepository : IProductRepository
     {
@@ -13,32 +13,15 @@ namespace ProductService.Repositories
         private readonly SemaphoreSlim _semaphore = new(1, 1);
         private int _currentId = 0;
 
-        public async Task<IEnumerable<Product>> GetAllProducts(CancellationToken cancellationToken)
+        public Task<IEnumerable<Product>> GetAllProducts(CancellationToken cancellationToken)
         {
-            await _semaphore.WaitAsync(cancellationToken);
-            try
-            {
-                return _products.Values.ToList();
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
+            return Task.FromResult(_products.Values.AsEnumerable());
         }
 
-        public async Task<Product> GetProductById(int id, CancellationToken cancellationToken)
+        public Task<Product> GetProductById(int id, CancellationToken cancellationToken)
         {
-            await _semaphore.WaitAsync(cancellationToken);
-            try
-            {
-                _products.TryGetValue(id, out var product);
-                return product;
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
-
+            _products.TryGetValue(id, out var product);
+            return Task.FromResult(product);
         }
 
         public async Task<bool> NewProduct(Product product, CancellationToken cancellationToken)
@@ -46,11 +29,14 @@ namespace ProductService.Repositories
             await _semaphore.WaitAsync(cancellationToken);
             try
             {
+                if (_products.Values.Any(x => x.Name == product.Name)) { return false; }
+
                 int newId = ++_currentId;
                 product.Id = newId;
                 if (!_products.ContainsKey(newId))
                 {
-                    _products[newId] = product;
+                    product.Id = _currentId;
+                    _products[_currentId] = product;
                     return true;
                 }
                 return false;
@@ -66,6 +52,8 @@ namespace ProductService.Repositories
             await _semaphore.WaitAsync(cancellationToken);
             try
             {
+                if (_products.Values.Any(x => x.Name == product.Name)) { return false; }
+
                 if (_products.ContainsKey(product.Id))
                 {
                     _products[product.Id] = product;
